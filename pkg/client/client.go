@@ -6,8 +6,18 @@ import (
 	"net/http"
 
 	"github.com/huner2/go-wsus/internal/soap"
+	"github.com/huner2/go-wsus/pkg/requests"
 )
 
+// NewClient creates a new WSUS client.
+// Options are specified through the ClientOptions struct.
+// Any invalid options will return an error.
+// Default options:
+// - Path: /ApiRemoting30/WebService.asmx
+// - Domain: ""
+// - Workstation: ""
+// - IsHash: false
+// - Debug: false
 func NewClient(options ClientOptions) (*Client, error) {
 	if options.Host == "" {
 		return nil, errors.New(noHost)
@@ -29,7 +39,11 @@ func NewClient(options ClientOptions) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) SendPost(data []byte) ([]byte, error) {
+// Send sends a POST request to the WSUS server.
+// The data is specified through the data parameter.
+// It assumes the data is valid XML.
+// Returns the response from the WSUS server or an error.
+func (c *Client) Send(data requests.SOAPRequest) ([]byte, error) {
 	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
