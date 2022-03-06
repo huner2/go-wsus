@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/huner2/go-wsus/internal/soap"
-	"github.com/huner2/go-wsus/pkg/requests"
 )
 
 // NewClient creates a new WSUS client.
@@ -41,10 +40,15 @@ func NewClient(options ClientOptions) (*Client, error) {
 
 // Send sends a POST request to the WSUS server.
 // The data is specified through the data parameter.
-// It assumes the data is valid XML.
+// It assumes the data will coerce to valid XML.
 // Returns the response from the WSUS server or an error.
-func (c *Client) Send(data requests.SOAPRequest) ([]byte, error) {
-	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(data))
+func (c *Client) Send(data SOAPInterface) ([]byte, error) {
+	bin, err := data.toXml()
+	if err != nil {
+		return nil, err
+	}
+	bin = wrapXML(bin)
+	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(bin))
 	if err != nil {
 		return nil, err
 	}

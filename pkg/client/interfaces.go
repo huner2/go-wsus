@@ -1,12 +1,32 @@
-package requests
+package client
 
 import (
 	"encoding/xml"
+	"errors"
 
 	"github.com/google/uuid"
 )
 
-type SOAPRequest []byte
+type SOAPInterface interface {
+	toXml() ([]byte, error)
+}
+
+type anyType struct {
+	Value interface{} `xml:"apir:anyType,omitempty"`
+}
+
+type genericReadableRow struct {
+	XMLName xml.Name  `xml:"apir:GenericReadableRow"`
+	Values  []anyType `xml:"apir:Values"`
+}
+
+func toGenericReadableRows(rows interface{}) (genericReadableRow, error) {
+	_, ok := rows.([]interface{})
+	if !ok {
+		return genericReadableRow{}, errors.New("invalid type")
+	}
+	return genericReadableRow{}, nil
+}
 
 type DynamicCategoryType uint8
 
@@ -40,4 +60,24 @@ type DynamicCategory struct {
 	IsSyncEnabled bool                      `xml:"apir:isSyncEnabled omitempty"`
 	DiscoveryTime int64                     `xml:"apir:discoveryTime omitempty"`
 	TargetId      int                       `xml:"apir:targetId omitempty"`
+}
+
+func (d DynamicCategory) toXml() ([]byte, error) {
+	return xml.Marshal(d)
+}
+
+type DynamicCategories []DynamicCategory
+
+func (d DynamicCategories) toXml() ([]byte, error) {
+	return xml.Marshal(d)
+}
+
+func (d DynamicCategories) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	root := xml.StartElement{
+		Name: xml.Name{
+			Local: "apir:AddDynamicCategories",
+		},
+	}
+	toGenericReadableRows(d)
+	return e.EncodeElement(d, root)
 }
