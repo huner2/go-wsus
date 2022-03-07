@@ -2,6 +2,7 @@ package client
 
 import "github.com/huner2/go-wsus/internal/soap"
 
+// Client represents a WSUS client.
 type Client struct {
 	*soap.SoapEndpoint
 }

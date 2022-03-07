@@ -11,12 +11,14 @@ import (
 // NewClient creates a new WSUS client.
 // Options are specified through the ClientOptions struct.
 // Any invalid options will return an error.
+//
 // Default options:
-// - Path: /ApiRemoting30/WebService.asmx
-// - Domain: ""
-// - Workstation: ""
-// - IsHash: false
-// - Debug: false
+//
+//  - Path: /ApiRemoting30/WebService.asmx
+//  - Domain: ""
+//  - Workstation: ""
+//  - IsHash: false
+//  - Debug: false
 func NewClient(options ClientOptions) (*Client, error) {
 	if options.Host == "" {
 		return nil, errors.New(noHost)
@@ -39,8 +41,9 @@ func NewClient(options ClientOptions) (*Client, error) {
 }
 
 // Send sends a POST request to the WSUS server.
-// The data is specified through the data parameter.
-// It assumes the data will coerce to valid XML.
+//
+// The data specified should be one of the interfaces defined in this package.
+//
 // Returns the response from the WSUS server or an error.
 func (c *Client) Send(data SOAPInterface) ([]byte, error) {
 	bin, err := data.toXml()
