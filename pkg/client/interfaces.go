@@ -106,3 +106,122 @@ func (d DynamicCategoriesInterface) MarshalXML(e *xml.Encoder, start xml.StartEl
 	}
 	return e.Encode(rows)
 }
+
+// NewLanguage represents a locale in WSUS.
+type NewLanguageInterface struct {
+	XMLName       xml.Name `xml:"apir:AddNewLanguage"`
+	ID            int      `xml:"apir:newLanguage>apir:LanguageId"`
+	ShortLanguage string   `xml:"apir:newLanguage>apir:ShortLanguage"`
+	LongLanguage  string   `xml:"apir:newLanguage>apir:LongLanguage"`
+	Enabled       bool     `xml:"apir:newLanguage>apir:Enabled"`
+}
+
+func (n NewLanguageInterface) toXml() ([]byte, error) {
+	return xml.Marshal(n)
+}
+
+// AutomaticUpdateApprovalRule is used to apply automatic update approval rules to WSUS.
+type AutomaticUpdateApprovalRuleInterface struct {
+	XMLName xml.Name `xml:"apir:ApplyAutomaticUpdateApprovalRule"`
+	ID      int      `xml:"apir:ruleId"`
+}
+
+func (a AutomaticUpdateApprovalRuleInterface) toXml() ([]byte, error) {
+	return xml.Marshal(a)
+}
+
+// CatalogSiteGetMetadataAndImport is used to get metadata and import update binaries.
+type CatalogSiteGetMetadataAndImportInterface struct {
+	XMLName             xml.Name  `xml:"apir:CatalogSiteGetMetadataAndImport"`
+	ID                  uuid.UUID `xml:"apir:updateId"`
+	DownloadFileDigests []byte    `xml:"apir:downloadFileDigests>apir:base64Binary"`
+}
+
+func (c CatalogSiteGetMetadataAndImportInterface) toXml() ([]byte, error) {
+	return xml.Marshal(c)
+}
+
+// InstallApprovalRule is used to create an install approval rule.
+type InstallApprovalRuleInterface struct {
+	XMLName xml.Name `xml:"apir:CreateInstallApprovalRule"`
+	Name    string   `xml:"apir:name"`
+}
+
+func (c InstallApprovalRuleInterface) toXml() ([]byte, error) {
+	return xml.Marshal(c)
+}
+
+// DeleteDynamicCategory is used to delete a dynamic category.
+type DeleteDynamicCategoryInterface struct {
+	XMLName xml.Name  `xml:"apir:DeleteDynamicCategory"`
+	ID      uuid.UUID `xml:"apir:id"`
+}
+
+func (d DeleteDynamicCategoryInterface) toXml() ([]byte, error) {
+	return xml.Marshal(d)
+}
+
+// DeleteInstallApprovalRule is used to delete an install approval rule.
+type DeleteInstallApprovalRuleInterface struct {
+	XMLName xml.Name `xml:"apir:DeleteInstallApprovalRule"`
+	ID      int      `xml:"apir:id"`
+}
+
+func (d DeleteInstallApprovalRuleInterface) toXml() ([]byte, error) {
+	return xml.Marshal(d)
+}
+
+// ExecuteGetSigningCertificate is used to get the WSUS signing certificate.
+type ExecuteGetSigningCertificate struct {
+	XMLName xml.Name `xml:"apir:ExecuteGetSigningCertificate"`
+}
+
+func (e ExecuteGetSigningCertificate) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteReplicaSPDeleteDeployment is used to delete a replica deployment.
+type ExecuteReplicaSPDeleteDeployment struct {
+	XMLName xml.Name  `xml:"apir:ExecuteReplicaSPDeleteDeployment"`
+	ID      uuid.UUID `xml:"apir:id"`
+}
+
+func (e ExecuteReplicaSPDeleteDeployment) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSetSelfSigningCertificate instructs the WSUS server to use a self-signed certificate.
+type ExecuteSetSelfSigningCertificate struct {
+	XMLName xml.Name `xml:"apir:ExecuteSetSelfSigningCertificate"`
+}
+
+func (e ExecuteSetSelfSigningCertificate) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSetSigningCertificate allows specification of a signing certificate.
+// The certificate should be in PFX format.
+// It must have a password.
+type ExecuteSetSigningCertificate struct {
+	XMLName  xml.Name `xml:"apir:ExecuteSetSigningCertificate"`
+	Cert     []byte   `xml:"apir:PFXFileContent"`
+	Password []byte   `xml:"apir:passwordBytes"`
+}
+
+func (e ExecuteSetSigningCertificate) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPAcceptEula is used to accept the EULA for an update.
+// AdminName should be the CN of the user who "accepted" the EULA.
+type ExecuteSPAcceptEula struct {
+	XMLName   xml.Name  `xml:"apir:ExecuteSPAcceptEula"`
+	ID        uuid.UUID `xml:"apir:id"`
+	AdminName string    `xml:"apir:adminName"`
+	UpdateID  uuid.UUID `xml:"apir:updateId>apir:updateId"`
+	Revision  int       `xml:"apir:updateId>apir:revision"`
+}
+
+func (e ExecuteSPAcceptEula) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
