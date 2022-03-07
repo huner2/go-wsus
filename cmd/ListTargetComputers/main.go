@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -27,15 +28,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	reqbody := `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apir="http://www.microsoft.com/SoftwareDistribution/Server/ApiRemotingWebService">
-	<soapenv:Header/>
-	<soapenv:Body>
-	   <apir:ExecuteSPGetAllComputers/>
-	</soapenv:Body>
- </soapenv:Envelope>`
-	res, err := endpoint.SendPost([]byte(reqbody))
+	var d client.ExecuteSPCountUpdatesToCompressInterface
+	res, err := endpoint.Send(d)
 	if err != nil {
 		panic(err)
 	}
-	println(string(res))
+	count, err := client.GetSPCountUpdatesToCompressResponse(res)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(count)
 }
