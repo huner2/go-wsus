@@ -212,7 +212,9 @@ func (e ExecuteSetSigningCertificateInterface) toXml() ([]byte, error) {
 }
 
 // ExecuteSPAcceptEula is used to accept the EULA for an update.
-// AdminName should be the CN of the user who "accepted" the EULA if provided.
+//
+// AdminName represents the name of the user who accepted the update.
+// Should be in domain\username format if provided.
 type ExecuteSPAcceptEulaInterface struct {
 	XMLName   xml.Name  `xml:"apir:ExecuteSPAcceptEula"`
 	ID        uuid.UUID `xml:"apir:id"`
@@ -239,7 +241,7 @@ func (e ExecuteSPAcceptEulaForReplicaDSSInterface) toXml() ([]byte, error) {
 type ExecuteSPAddComputerToTargetGroupAllowMultipleGroupsInterface struct {
 	XMLName       xml.Name  `xml:"apir:ExecuteSPAddComputerToTargetGroupAllowMultipleGroups"`
 	TargetGroupID uuid.UUID `xml:"apir:targetGroupId"`
-	ComputerID    int       `xml:"apir:computerId"`
+	ComputerID    string    `xml:"apir:computerId"`
 }
 
 func (e ExecuteSPAddComputerToTargetGroupAllowMultipleGroupsInterface) toXml() ([]byte, error) {
@@ -347,5 +349,177 @@ type ExecuteSPCreateTargetGroupPreciseInterface struct {
 }
 
 func (e ExecuteSPCreateTargetGroupPreciseInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeclineExpiredUpdates is used to decline all expired updates.
+type ExecuteSPDeclineExpiredUpdatesInterface struct {
+	XMLName   xml.Name `xml:"apir:ExecuteSPDeclineExpiredUpdates"`
+	AdminName string   `xml:"apir:adminName"` // optional
+}
+
+func (e ExecuteSPDeclineExpiredUpdatesInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeclineSupercededUpdates is used to decline all superceded updates.
+type ExecuteSPDeclineSupercededUpdatesInterface struct {
+	XMLName   xml.Name `xml:"apir:ExecuteSPDeclineSupercededUpdates"`
+	AdminName string   `xml:"apir:adminName"` // optional
+}
+
+func (e ExecuteSPDeclineSupercededUpdatesInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeclineUpdate will decline the specified update.
+type ExecuteSPDeclineUpdateInterface struct {
+	XMLName       xml.Name  `xml:"apir:ExecuteSPDeclineUpdate"`
+	ID            uuid.UUID `xml:"apir:updateId"`
+	AdminName     string    `xml:"apir:adminName"` // optional
+	FailIfReplica bool      `xml:"apir:failIfReplica"`
+}
+
+func (e ExecuteSPDeclineUpdateInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeleteComputer deletes a computer from the WSUS inventory.
+type ExecuteSPDeleteComputerInterface struct {
+	XMLName xml.Name `xml:"apir:ExecuteSPDeleteComputer"`
+	ID      string   `xml:"apir:id"`
+}
+
+func (e ExecuteSPDeleteComputerInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeleteDeployment deletes a deployed WSUS server from the deployment group.
+type ExecuteSPDeleteDeploymentInterface struct {
+	XMLName   xml.Name  `xml:"apir:ExecuteSPDeleteDeployment"`
+	ID        uuid.UUID `xml:"apir:id"`
+	AdminName string    `xml:"apir:adminName"` // optional
+}
+
+func (e ExecuteSPDeleteDeploymentInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeleteDownstreamServer deletes a downstream server from the deployment group.
+type ExecuteSPDeleteDownstreamServerInterface struct {
+	XMLName xml.Name  `xml:"apir:ExecuteSPDeleteDownstreamServer"`
+	ID      uuid.UUID `xml:"apir:id"`
+}
+
+func (e ExecuteSPDeleteDownstreamServerInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeleteTargetGroup deletes a target group.
+type ExecuteSPDeleteTargetGroupInterface struct {
+	XMLName       xml.Name  `xml:"apir:ExecuteSPDeleteTargetGroup"`
+	ID            uuid.UUID `xml:"apir:id"`
+	AdminName     string    `xml:"apir:adminName"` // optional
+	FailIfReplica bool      `xml:"apir:failIfReplica"`
+}
+
+func (e ExecuteSPDeleteTargetGroupInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeleteUpdate removes a local update from the WSUS inventory.
+//
+// ID is the local update ID.
+type ExecuteSPDeleteUpdateInterface struct {
+	XMLName xml.Name `xml:"apir:ExecuteSPDeleteUpdate"`
+	ID      int      `xml:"apir:localUpdateID"`
+}
+
+func (e ExecuteSPDeleteUpdateInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeleteUpdateByID removes an update from the WSUS inventory.
+//
+// ID is the update GUID.
+type ExecuteSPDeleteUpdateByIDInterface struct {
+	XMLName xml.Name  `xml:"apir:ExecuteSPDeleteUpdateByID"`
+	ID      uuid.UUID `xml:"apir:updateID"`
+}
+
+func (e ExecuteSPDeleteUpdateByIDInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+type UpdateDeploymentAction int
+
+const (
+	UpdateDeploymentAction_Install UpdateDeploymentAction = iota
+	UpdateDeploymentAction_Uninstall
+	UpdateDeploymentAction_NotApproved
+)
+
+type UpdateDeploymentDownloadPriority int
+
+const (
+	UpdateDeploymentDownloadPriority_High UpdateDeploymentDownloadPriority = iota
+	UpdateDeploymentDownloadPriority_Normal
+	UpdateDeploymentDownloadPriority_Low
+)
+
+// ExecuteSPDeployUpdate allows for deployment of an update to a specified target group.
+//
+// Deadline is the deadline for the update to be deployed on a client (essentially a priority modifier).
+// Deadline is a nanosecond timestamp.
+//
+// IsAssigned must be set to true.
+type ExecuteSPDeployUpdateInterface struct {
+	XMLName          xml.Name               `xml:"apir:ExecuteSPDeployUpdate1"`
+	ID               uuid.UUID              `xml:"apir:updateId>UpdateId"`
+	Revision         int                    `xml:"apir:updateId>Revision"`
+	DeploymentAction UpdateDeploymentAction `xml:"apir:deploymentAction"`
+	TargetGroup      uuid.UUID              `xml:"apir:targetGroupId"`
+	Deadline         int64                  `xml:"apir:deadline"`
+	AdminName        string                 `xml:"apir:adminName"` // optional
+	IsAssigned       bool                   `xml:"apir:isAssigned"`
+}
+
+func (e ExecuteSPDeployUpdateInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPDeployUpdatePrecise allows for deployment of an update with extended options.
+//
+// GoLiveTime is the time at which the update will appear for clients.
+//
+// DownloadPriority is the priority of the update, the higher the number the higher the priority.
+//
+// DeploymentGUID denotes the GUID of the deployment.
+// It is present when replicating deployments of a USS to DSS, as deployment GUIDs MUST be the same.
+// If the deployment is not part of a USS/DSS replica synchronization, this field SHOULD be left default.
+//
+// TranslateSQLException is undocumented - leaving as false is recommended.
+//
+// FailIfReplica will prevent the action if the server is in replication.
+//
+// IsReplicaSync should always be set to false.
+type ExecuteSPDeployUpdatePreciseInterface struct {
+	XMLName               xml.Name                         `xml:"apir:ExecuteSPDeployUpdate2"`
+	ID                    uuid.UUID                        `xml:"apir:updateId"`
+	Revision              int                              `xml:"apir:revisionNumber"`
+	DeploymentAction      UpdateDeploymentAction           `xml:"apir:deploymentAction"`
+	TargetGroup           uuid.UUID                        `xml:"apir:targetGroupId"`
+	AdminName             string                           `xml:"apir:adminName"` // optional
+	Deadline              int64                            `xml:"apir:deadline"`
+	IsAssigned            bool                             `xml:"apir:isAssigned"`
+	GoLiveTime            int64                            `xml:"apir:goLiveTime"`
+	DownloadPriority      UpdateDeploymentDownloadPriority `xml:"apir:downloadPriority"`
+	DeploymentGUID        uuid.UUID                        `xml:"apir:deploymentGUID"` // optional
+	TranslateSQLException bool                             `xml:"apir:translateSqlException"`
+	FailIfReplica         bool                             `xml:"apir:failIfReplica"`
+	IsReplicaSync         bool                             `xml:"apir:isReplicaSync"`
+}
+
+func (e ExecuteSPDeployUpdatePreciseInterface) toXml() ([]byte, error) {
 	return xml.Marshal(e)
 }
