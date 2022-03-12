@@ -28,14 +28,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	var d client.ExecuteSPCountUpdatesToCompressInterface
+	var d client.ExecuteSPGetAllComputersInterface
 	res, err := endpoint.Send(d)
 	if err != nil {
 		panic(err)
 	}
-	count, err := client.GetSPCountUpdatesToCompressResponse(res)
+	targets, req, ass, err := client.GetSPGetAllComputersResponse(res)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(count)
+	fmt.Println(targets, req, ass)
 }
