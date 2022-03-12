@@ -539,3 +539,16 @@ type ExecuteSPGetAllTargetGroupsInterface struct {
 func (e ExecuteSPGetAllTargetGroupsInterface) toXml() ([]byte, error) {
 	return xml.Marshal(e)
 }
+
+// ExecuteSPGetApprovedUpdatesMetaData returns information for all approved updates in the WSUS database.
+//
+// Use GetSPGetApprovedUpdatesMetaDataResponse to parse the response.
+type ExecuteSPGetApprovedUpdateMetadataInterface struct {
+	XMLName                 xml.Name   `xml:"apir:ExecuteSPGetApprovedUpdateMetadata"`
+	UpdateCategoryIDs       [][16]byte `xml:"apir:updateCategoryIds>guid"`       // optional
+	UpdateClassificationIDs [][16]byte `xml:"apir:updateClassificationIds>guid"` // optional
+}
+
+func (e ExecuteSPGetApprovedUpdateMetadataInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}

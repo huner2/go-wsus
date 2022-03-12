@@ -58,9 +58,21 @@ func (row *readableRow) fromGenericReadableRow(target interface{}) error {
 			switch typeField.Kind() {
 			case reflect.String:
 				field.SetString(row.Values[i])
-			case reflect.Int:
+			case reflect.Int, reflect.Int64:
 				if value, err := strconv.ParseInt(row.Values[i], 10, 64); err == nil {
 					field.SetInt(value)
+				} else {
+					return err
+				}
+			case reflect.TypeOf(PatchingType(0)).Kind():
+				if value, err := strconv.ParseInt(row.Values[i], 10, 64); err == nil {
+					field.Set(reflect.ValueOf(PatchingType(value)))
+				} else {
+					return err
+				}
+			case reflect.TypeOf(UpdateDeploymentAction(0)).Kind():
+				if value, err := strconv.ParseInt(row.Values[i], 10, 64); err == nil {
+					field.Set(reflect.ValueOf(UpdateDeploymentAction(value)))
 				} else {
 					return err
 				}
@@ -341,4 +353,100 @@ func GetSPGetAllTargetGroupsResponse(response []byte) ([]TargetGroup, error) {
 	}
 
 	return targetGroups, nil
+}
+
+type getSPGetApprovedUpdatesMetaDataResponse struct {
+	XMLName xml.Name                    `xml:"ExecuteSPGetApprovedUpdatesMetaDataResponse"`
+	Array   []arrayOfGenericReadableRow `xml:"ExecuteSPGetApprovedUpdatesMetaDataResult>ArrayOfGenericReadableRow"`
+}
+
+// UpdateMetaData represents the information stored in WSUS about an update.
+type UpdateMetaData struct {
+	UpdateID       string
+	RevisionNumber int
+	RevisionID     int
+	XML            string
+
+	// If xml is not set, this will be set.
+	// Base64 encoded data.
+	// Compressed using in-memory CAB files.
+	// https://docs.microsoft.com/en-us/windows/win32/msi/cabinet-files
+	XMLCompressed string
+
+	LocalUpdateID int
+}
+
+type PatchingType int
+
+const (
+	PatchingTypeNone      PatchingType = iota
+	PatchingTypeContained PatchingType = iota
+	PatchingTypeExpress   PatchingType = iota
+	PatchingTypeDelta     PatchingType = iota
+)
+
+// UpdateFile represents the information stored in WSUS about an update file.
+type UpdateFile struct {
+	RevisionID   int
+	FileName     string
+	Modified     int64
+	HostedOnMU   bool
+	Size         string
+	FileSize     int
+	PatchingType PatchingType
+	IsEula       bool
+}
+
+// UpdateApproval represents the information stored in WSUS about an update approval.
+type UpdateApproval struct {
+	DeploymentTime string // utc
+	Deployed       bool
+	ActionID       UpdateDeploymentAction
+	GoLiveTime     string // utc
+	Deadline       string
+	AdminName      string
+	DeploymentGUID string
+	IsAssigned     bool
+	UpdateID       string
+	RevisionNumber int
+	TargetGroupID  string
+}
+
+func GetSPGetApprovedUpdatesMetaDataResponse(response []byte) ([]UpdateMetaData, []UpdateFile, []UpdateApproval, error) {
+	var e soapEnvelope
+	if err := xml.Unmarshal(response, &e); err != nil {
+		return nil, nil, nil, err
+	}
+	var r getSPGetApprovedUpdatesMetaDataResponse
+	if err := xml.Unmarshal(e.Body.Data, &r); err != nil {
+		return nil, nil, nil, err
+	}
+	var updates []UpdateMetaData
+	for _, row := range r.Array[0].Rows {
+		var update UpdateMetaData
+		if err := row.fromGenericReadableRow(&update); err != nil {
+			return nil, nil, nil, err
+		}
+		updates = append(updates, update)
+	}
+
+	var updateFiles []UpdateFile
+	for _, row := range r.Array[1].Rows {
+		var updateFile UpdateFile
+		if err := row.fromGenericReadableRow(&updateFile); err != nil {
+			return nil, nil, nil, err
+		}
+		updateFiles = append(updateFiles, updateFile)
+	}
+
+	var updateApprovals []UpdateApproval
+	for _, row := range r.Array[2].Rows {
+		var updateApproval UpdateApproval
+		if err := row.fromGenericReadableRow(&updateApproval); err != nil {
+			return nil, nil, nil, err
+		}
+		updateApprovals = append(updateApprovals, updateApproval)
+	}
+
+	return updates, updateFiles, updateApprovals, nil
 }
