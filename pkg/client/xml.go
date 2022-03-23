@@ -412,6 +412,7 @@ type UpdateApproval struct {
 	TargetGroupID  string
 }
 
+// GetSPGetApprovedUpdatesMetaDataResponse returns a slice of UpdateMetaData, UpdateFiles, and UpdateApprovals - or an error.
 func GetSPGetApprovedUpdatesMetaDataResponse(response []byte) ([]UpdateMetaData, []UpdateFile, []UpdateApproval, error) {
 	var e soapEnvelope
 	if err := xml.Unmarshal(response, &e); err != nil {
@@ -449,4 +450,174 @@ func GetSPGetApprovedUpdatesMetaDataResponse(response []byte) ([]UpdateMetaData,
 	}
 
 	return updates, updateFiles, updateApprovals, nil
+}
+
+type getSPGetCategoriesResponse struct {
+	XMLName xml.Name      `xml:"ExecuteSPGetCategoriesResponse"`
+	Rows    []readableRow `xml:"ExecuteSPGetCategoriesResult>ArrayOfGenericReadableRow"`
+}
+
+// Category represents an update category
+type Category struct {
+	LocalUpdateID          int
+	UpdateID               [16]byte
+	CategoryType           string
+	ProhibitsSubcategories bool
+	ProhibitsUpdates       bool
+	CategoryIndex          int
+	DisplayOrder           int
+	Title                  string
+	Description            string
+	ReleaseNotes           string
+	Received               int64
+	UpdateSource           int
+}
+
+// GetSPGetCategoriesResponse returns a slice of Category - or an error.
+func GetSPGetCategoriesResponse(data []byte) ([]Category, error) {
+	var e soapEnvelope
+	if err := xml.Unmarshal(data, &e); err != nil {
+		return nil, err
+	}
+	var r getSPGetCategoriesResponse
+	if err := xml.Unmarshal(e.Body.Data, &r); err != nil {
+		return nil, err
+	}
+	var categories []Category
+	for _, row := range r.Rows {
+		var category Category
+		if err := row.fromGenericReadableRow(&category); err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}
+
+	return categories, nil
+}
+
+type getSPGetCategoryByIDResponse struct {
+	XMLName xml.Name    `xml:"ExecuteSPGetCategoryByIDResponse"`
+	Row     readableRow `xml:"ExecuteSPGetCategoryByIDResult>GenericReadableRow"`
+}
+
+// GetSPGetCategoryByIDResponse returns a Category - or an error.
+func GetSPGetCategoryByIDResponse(data []byte) (*Category, error) {
+	var e soapEnvelope
+	if err := xml.Unmarshal(data, &e); err != nil {
+		return nil, err
+	}
+	var r getSPGetCategoryByIDResponse
+	if err := xml.Unmarshal(e.Body.Data, &r); err != nil {
+		return nil, err
+	}
+	var category Category
+	if err := r.Row.fromGenericReadableRow(&category); err != nil {
+		return nil, err
+	}
+
+	return &category, nil
+}
+
+type getSPGetChildTargetGroupsResponse struct {
+	XMLName xml.Name      `xml:"ExecuteSPGetChildTargetGroupsResponse"`
+	Rows    []readableRow `xml:"ExecuteSPGetChildTargetGroupsResult>ArrayOfGenericReadableRow"`
+}
+
+// GetSPGetChildTargetGroupsResponse returns a slice of TargetGroup - or an error.
+func GetSPGetChildTargetGroupsResponse(data []byte) ([]TargetGroup, error) {
+	var e soapEnvelope
+	if err := xml.Unmarshal(data, &e); err != nil {
+		return nil, err
+	}
+	var r getSPGetChildTargetGroupsResponse
+	if err := xml.Unmarshal(e.Body.Data, &r); err != nil {
+		return nil, err
+	}
+	var targetGroups []TargetGroup
+	for _, row := range r.Rows {
+		var targetGroup TargetGroup
+		if err := row.fromGenericReadableRow(&targetGroup); err != nil {
+			return nil, err
+		}
+		targetGroups = append(targetGroups, targetGroup)
+	}
+
+	return targetGroups, nil
+}
+
+type getSPGetClientsWithRecentNameChangeResponse struct {
+	XMLName xml.Name      `xml:"ExecuteSPGetClientsWithRecentNameChangeResponse"`
+	Rows    []readableRow `xml:"ExecuteSPGetClientsWithRecentNameChangeResult>ArrayOfGenericReadableRow"`
+}
+
+// GetSPGetClientsWithRecentNameChangeResponse returns a slice of FQDNs - or an error.
+func GetSPGetClientsWithRecentNameChangeResponse(data []byte) ([]string, error) {
+	var e soapEnvelope
+	if err := xml.Unmarshal(data, &e); err != nil {
+		return nil, err
+	}
+	var r getSPGetClientsWithRecentNameChangeResponse
+	if err := xml.Unmarshal(e.Body.Data, &r); err != nil {
+		return nil, err
+	}
+	var clients []string
+	for _, row := range r.Rows {
+		var client string
+		if err := row.fromGenericReadableRow(&client); err != nil {
+			return nil, err
+		}
+		clients = append(clients, client)
+	}
+
+	return clients, nil
+}
+
+type getSPGetComponentWithErrorsResponse struct {
+	XMLName xml.Name      `xml:"ExecuteSPGetComponentWithErrorsResponse"`
+	Rows    []readableRow `xml:"ExecuteSPGetComponentWithErrorsResult>ArrayOfGenericReadableRow"`
+}
+
+// GetSPGetComponentWithErrorsResponse returns a slice of component names - or an error.
+func GetSPGetComponentWithErrorsResponse(data []byte) ([]string, error) {
+	var e soapEnvelope
+	if err := xml.Unmarshal(data, &e); err != nil {
+		return nil, err
+	}
+	var r getSPGetComponentWithErrorsResponse
+	if err := xml.Unmarshal(e.Body.Data, &r); err != nil {
+		return nil, err
+	}
+	var clients []string
+	for _, row := range r.Rows {
+		var client string
+		if err := row.fromGenericReadableRow(&client); err != nil {
+			return nil, err
+		}
+		clients = append(clients, client)
+	}
+
+	return clients, nil
+}
+
+type getSPGetComputerByIDResponse struct {
+	XMLName xml.Name    `xml:"ExecuteSPGetComputerByIDResponse"`
+	Row     readableRow `xml:"ExecuteSPGetComputerByIDResult>GenericReadableRow"`
+}
+
+// GetSPGetComputerByIDResponse returns a ITargetComputer - or an error.
+func GetSPGetComputerByIDResponse(data []byte) (*ITargetComputer, error) {
+	var e soapEnvelope
+	if err := xml.Unmarshal(data, &e); err != nil {
+		return nil, err
+	}
+	var r getSPGetComputerByIDResponse
+	if err := xml.Unmarshal(e.Body.Data, &r); err != nil {
+		return nil, err
+	}
+	var computer ITargetComputer
+	if err := r.Row.fromGenericReadableRow(&computer); err != nil {
+		return nil, err
+	}
+
+	return &computer, nil
 }

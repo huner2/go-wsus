@@ -552,3 +552,78 @@ type ExecuteSPGetApprovedUpdateMetadataInterface struct {
 func (e ExecuteSPGetApprovedUpdateMetadataInterface) toXml() ([]byte, error) {
 	return xml.Marshal(e)
 }
+
+// ExecuteSPGetCategories returns information for all categories in the WSUS database.
+//
+// Use GetSPGetCategoriesResponse to parse the response.
+type ExecuteSPGetCategoriesInterface struct {
+	XMLName                       xml.Name `xml:"apir:ExecuteSPGetCategories"`
+	PreferredCulture              string   `xml:"apir:preferredCulture"`
+	RetrieveUpdateClassifications bool     `xml:"apir:retrieveUpdateClassifications"`
+	FromSyncDate                  int64    `xml:"apir:fromSyncDate"`
+	ToSyncDate                    int64    `xml:"apir:toSyncDate"`
+}
+
+func (e ExecuteSPGetCategoriesInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPGetCategoryByID returns information for a category in the WSUS database.
+//
+// Use GetSPGetCategoryByIDResponse to parse the response.
+type ExecuteSPGetCategoryByIDInterface struct {
+	XMLName                      xml.Name `xml:"apir:ExecuteSPGetCategoryByID"`
+	PreferredCulture             string   `xml:"apir:preferredCulture"`
+	RetrieveUpdateClassification bool     `xml:"apir:retrieveUpdateClassification"`
+	ID                           [16]byte `xml:"apir:id"`
+}
+
+func (e ExecuteSPGetCategoryByIDInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPGetChildTargetGroups returns information for all child target groups of the specified parent group.
+//
+// Use GetSPGetChildTargetGroupsResponse to parse the response.
+type ExecuteSPGetChildTargetGroupsInterface struct {
+	XMLName xml.Name `xml:"apir:ExecuteSPGetChildTargetGroups"`
+	ID      [16]byte `xml:"apir:targetGroupId"`
+}
+
+func (e ExecuteSPGetChildTargetGroupsInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPGetClientsWithRecentNameChange returns information for all clients with a recent name change.
+//
+// Use GetSPGetClientsWithRecentNameChangeResponse to parse the response.
+type ExecuteSPGetClientsWithRecentNameChangeInterface struct {
+	XMLName xml.Name `xml:"apir:ExecuteSPGetClientsWithRecentNameChange"`
+}
+
+func (e ExecuteSPGetClientsWithRecentNameChangeInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPGetComponentWithErrorsInterface returns information for all components with errors.
+//
+// Use GetSPGetComponentWithErrorsResponse to parse the response.
+type ExecuteSPGetComponentsWithErrorsInterface struct {
+	XMLName xml.Name `xml:"apir:ExecuteSPGetComponentsWithErrors"`
+}
+
+func (e ExecuteSPGetComponentsWithErrorsInterface) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
+
+// ExecuteSPGetComputerByID returns information for a computer in the WSUS database.
+//
+// Use GetSPGetComputerByIDResponse to parse the response.
+type ExecuteSPGetComputerByID struct {
+	XMLName xml.Name `xml:"apir:ExecuteSPGetComputerByID"`
+	ID      string   `xml:"apir:id"`
+}
+
+func (e ExecuteSPGetComputerByID) toXml() ([]byte, error) {
+	return xml.Marshal(e)
+}
